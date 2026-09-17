@@ -3,33 +3,273 @@
     "id": "poi-cpu",
     "name": "Central Philippine University (CPU)",
     "aliases": ["CPU", "Central", "CPU Jaro", "CPU Gate 1"],
-    "category": "university",
+    "category": "school",
     "district": "Jaro",
     "location": [10.7314, 122.5539]
   },
   {
+    "id": "poi-up-visayas",
+    "name": "UP Visayas Iloilo City Campus",
+    "aliases": ["UPV", "UP Iloilo", "UP Visayas", "UP City Campus"],
+    "category": "school",
+    "district": "City Proper",
+    "location": [10.7042, 122.5562]
+  },
+  {
+    "id": "poi-san-agustin",
+    "name": "University of San Agustin",
+    "aliases": ["USA", "San Ag", "San Agustin", "University of San Agustin"],
+    "category": "school",
+    "district": "City Proper",
+    "location": [10.698, 122.562]
+  },
+  {
+    "id": "poi-wvsu",
+    "name": "West Visayas State University Main",
+    "aliases": ["WVSU", "West", "West Visayas State University", "WVSU Main"],
+    "category": "school",
+    "district": "Lapaz",
+    "location": [10.716, 122.5595]
+  },
+  {
+    "id": "poi-isatu",
+    "name": "Iloilo Science and Technology University (ISATU)",
+    "aliases": ["ISAT-U", "ISATU", "ISAT", "Western Visayas College of Science and Technology", "WVCST"],
+    "category": "school",
+    "district": "Lapaz",
+    "location": [10.7175, 122.5658]
+  },
+  {
+    "id": "poi-phinma-ui",
+    "name": "PHINMA – University of Iloilo",
+    "aliases": ["UI", "University of Iloilo", "PHINMA UI", "PHINMA University of Iloilo"],
+    "category": "school",
+    "district": "City Proper",
+    "location": [10.6958, 122.5692]
+  },
+  {
+    "id": "poi-spui",
+    "name": "St. Paul University Iloilo",
+    "aliases": ["SPUI", "St. Paul", "St. Paul University", "Saint Paul"],
+    "category": "school",
+    "district": "City Proper",
+    "location": [10.6998, 122.5645]
+  },
+  {
+    "id": "poi-idc",
+    "name": "Iloilo Doctors' College",
+    "aliases": ["IDC", "Doctors College", "Iloilo Doctors College"],
+    "category": "school",
+    "district": "Molo",
+    "location": [10.7025, 122.551]
+  },
+  {
+    "id": "poi-jblfmu-molo",
+    "name": "John B. Lacson Foundation Maritime Univ (Molo)",
+    "aliases": ["JBLFMU", "John B", "Lacson Molo", "John B. Lacson"],
+    "category": "school",
+    "district": "Molo",
+    "location": [10.6975, 122.541]
+  },
+  {
+    "id": "poi-wvmc",
+    "name": "Western Visayas Medical Center (WVMC)",
+    "aliases": ["WVMC", "Western Hospital", "Mandurriao Hospital", "Western Visayas Medical Center"],
+    "category": "hospital",
+    "district": "Mandurriao",
+    "location": [10.717, 122.5365]
+  },
+  {
+    "id": "poi-wvsumc",
+    "name": "West Visayas State Univ Medical Center",
+    "aliases": ["WVSU Medical Center", "WVSU Hospital", "Don Benito", "WVSUMC"],
+    "category": "hospital",
+    "district": "Jaro",
+    "location": [10.717, 122.561]
+  },
+  {
+    "id": "poi-st-paul-hospital",
+    "name": "St. Paul's Hospital Iloilo",
+    "aliases": ["St. Paul Hospital", "St Pauls Hospital", "SPH", "Saint Paul Hospital"],
+    "category": "hospital",
+    "district": "City Proper",
+    "location": [10.6995, 122.5648]
+  },
+  {
+    "id": "poi-tmc",
+    "name": "The Medical City Iloilo",
+    "aliases": ["The Medical City", "Medical City Iloilo", "TMC Iloilo", "Medical City Molo"],
+    "category": "hospital",
+    "district": "Molo",
+    "location": [10.695, 122.5385]
+  },
+  {
+    "id": "poi-idh",
+    "name": "Iloilo Doctors' Hospital",
+    "aliases": ["Doctors Hospital", "IDH", "Iloilo Doctors"],
+    "category": "hospital",
+    "district": "Molo",
+    "location": [10.7028, 122.5512]
+  },
+  {
+    "id": "poi-qualimed",
+    "name": "QualiMed Hospital Iloilo (Atria)",
+    "aliases": ["QualiMed", "Qualimed Hospital", "Atria Hospital"],
+    "category": "hospital",
+    "district": "Mandurriao",
+    "location": [10.7115, 122.5488]
+  },
+  {
     "id": "poi-sm-city",
     "name": "SM City Iloilo",
-    "aliases": ["SM", "SM City", "SM Mandurriao", "SM Northwing"],
+    "aliases": ["SM", "SM City", "SM Mandurriao", "SM Northwing", "SM Southwing"],
     "category": "mall",
     "district": "Mandurriao",
     "location": [10.7143, 122.5512]
   },
   {
     "id": "poi-festive-walk",
-    "name": "Festive Walk Mall (Megaworld)",
-    "aliases": ["Festive", "Megaworld", "Festive Walk"],
+    "name": "Festive Walk Mall",
+    "aliases": ["Festive", "Megaworld", "Festive Walk", "Festive Walk Mall", "Iloilo Business Park"],
     "category": "mall",
     "district": "Mandurriao",
     "location": [10.7186, 122.5453]
   },
   {
+    "id": "poi-robinsons-main",
+    "name": "Robinsons Place Iloilo",
+    "aliases": ["Robinsons", "Rob Main", "Quezon Wing", "Robinsons Place Iloilo"],
+    "category": "mall",
+    "district": "City Proper",
+    "location": [10.6976, 122.5684]
+  },
+  {
+    "id": "poi-robinsons-jaro",
+    "name": "Robinsons Place Jaro",
+    "aliases": ["Rob Jaro", "Robinsons Jaro", "Robinsons Place Jaro"],
+    "category": "mall",
+    "district": "Jaro",
+    "location": [10.7258, 122.5605]
+  },
+  {
+    "id": "poi-the-atrium",
+    "name": "The Atrium Iloilo",
+    "aliases": ["Atrium", "The Atrium", "Atrium Mall"],
+    "category": "mall",
+    "district": "City Proper",
+    "location": [10.6992, 122.5662]
+  },
+  {
+    "id": "poi-marymart",
+    "name": "Marymart Center",
+    "aliases": ["Marymart", "Marymart Mall", "Marymart Center Delgado"],
+    "category": "mall",
+    "district": "City Proper",
+    "location": [10.6965, 122.566]
+  },
+  {
+    "id": "poi-gaisano-icc",
+    "name": "Gaisano Iloilo City Center",
+    "aliases": ["GICC", "Gaisano City Center", "Gaisano Diversion"],
+    "category": "mall",
+    "district": "Mandurriao",
+    "location": [10.712, 122.551]
+  },
+  {
+    "id": "poi-ungka-terminal",
+    "name": "Ungka Transport Terminal",
+    "aliases": ["Ungka", "Ungka Flyover", "Ungka ITGSI", "Ungka Terminal"],
+    "category": "terminal",
+    "district": "Jaro",
+    "location": [10.7485, 122.5446]
+  },
+  {
+    "id": "poi-tagbak-terminal",
+    "name": "Tagbak Terminal",
+    "aliases": ["Tagbak", "North Terminal", "Tagbak Terminal Jaro"],
+    "category": "terminal",
+    "district": "Jaro",
+    "location": [10.749, 122.578]
+  },
+  {
+    "id": "poi-mohon-terminal",
+    "name": "Mohon Terminal",
+    "aliases": ["Mohon", "Villa Mohon", "South Terminal", "Mohon Terminal"],
+    "category": "terminal",
+    "district": "Arevalo",
+    "location": [10.686, 122.518]
+  },
+  {
+    "id": "poi-parola-terminal",
+    "name": "Parola Ferry Terminal",
+    "aliases": ["Parola", "Parola Wharf", "Guimaras Ferry", "Parola Terminal"],
+    "category": "terminal",
+    "district": "City Proper",
+    "location": [10.6955, 122.5795]
+  },
+  {
+    "id": "poi-festive-hub",
+    "name": "Festive Walk Transport Hub",
+    "aliases": ["Festive Hub", "Megaworld Hub", "Festive Transport Hub", "Iloilo Business Park Transport Hub"],
+    "category": "terminal",
+    "district": "Mandurriao",
+    "location": [10.7186, 122.5453]
+  },
+  {
     "id": "poi-jaro-cathedral",
-    "name": "Jaro Metropolitan Cathedral",
-    "aliases": ["Jaro Plaza", "Jaro Cathedral", "Jaro Belfry"],
+    "name": "Jaro Plaza & Cathedral",
+    "aliases": ["Jaro Plaza", "Jaro Cathedral", "Jaro Belfry", "Graciano Lopez Jaena Park"],
     "category": "plaza",
     "district": "Jaro",
     "location": [10.7247, 122.5579]
+  },
+  {
+    "id": "poi-molo-plaza",
+    "name": "Molo Plaza & St. Anne Parish",
+    "aliases": ["Molo Plaza", "Molo Church", "St. Anne Parish", "Feminist Church"],
+    "category": "plaza",
+    "district": "Molo",
+    "location": [10.696, 122.5375]
+  },
+  {
+    "id": "poi-plaza-libertad",
+    "name": "Plaza Libertad & City Hall",
+    "aliases": ["Libertad", "City Hall", "San Jose Church", "Plaza Libertad"],
+    "category": "plaza",
+    "district": "City Proper",
+    "location": [10.6928, 122.5714]
+  },
+  {
+    "id": "poi-lapaz-plaza",
+    "name": "La Paz Plaza",
+    "aliases": ["Lapaz Plaza", "La Paz Plaza", "Lapaz Football Field"],
+    "category": "plaza",
+    "district": "Lapaz",
+    "location": [10.7135, 122.5685]
+  },
+  {
+    "id": "poi-central-market",
+    "name": "Iloilo Central Market",
+    "aliases": ["Central Market", "Tienda Mayor", "Iloilo Central Market"],
+    "category": "market",
+    "district": "City Proper",
+    "location": [10.6948, 122.57]
+  },
+  {
+    "id": "poi-terminal-market",
+    "name": "Iloilo Terminal Market (\"Super\")",
+    "aliases": ["Super", "Iloilo Terminal Market", "Super Market Iloilo"],
+    "category": "market",
+    "district": "City Proper",
+    "location": [10.6952, 122.5645]
+  },
+  {
+    "id": "poi-lapaz-market",
+    "name": "La Paz Public Market",
+    "aliases": ["La Paz Market", "Lapaz Market", "La Paz Batchoy Market"],
+    "category": "market",
+    "district": "Lapaz",
+    "location": [10.7125, 122.567]
   },
   {
     "id": "poi-atria",
@@ -38,70 +278,6 @@
     "category": "mall",
     "district": "Mandurriao",
     "location": [10.7107, 122.5492]
-  },
-  {
-    "id": "poi-up-visayas",
-    "name": "UP Visayas (City Campus)",
-    "aliases": ["UPV", "UP Iloilo", "UP Visayas"],
-    "category": "university",
-    "district": "City Proper",
-    "location": [10.6974, 122.5647]
-  },
-  {
-    "id": "poi-molo-plaza",
-    "name": "Molo Plaza & Church",
-    "aliases": ["Molo Plaza", "Molo Church", "St. Anne Parish"],
-    "category": "plaza",
-    "district": "Molo",
-    "location": [10.6961, 122.5432]
-  },
-  {
-    "id": "poi-plaza-libertad",
-    "name": "Plaza Libertad",
-    "aliases": ["Libertad", "City Hall", "San Jose Church"],
-    "category": "plaza",
-    "district": "City Proper",
-    "location": [10.6928, 122.5714]
-  },
-  {
-    "id": "poi-tagbak-terminal",
-    "name": "Tagbak Terminal",
-    "aliases": ["Tagbak", "North Terminal"],
-    "category": "terminal",
-    "district": "Jaro",
-    "location": [10.7583, 122.5658]
-  },
-  {
-    "id": "poi-ungka-terminal",
-    "name": "Ungka Terminal (Pavia / Jaro Border)",
-    "aliases": ["Ungka", "Ungka Flyover", "Ungka ITGSI"],
-    "category": "terminal",
-    "district": "Jaro",
-    "location": [10.7485, 122.5446]
-  },
-  {
-    "id": "poi-mohon-terminal",
-    "name": "Mohon Terminal",
-    "aliases": ["Mohon", "Villa Mohon", "South Terminal"],
-    "category": "terminal",
-    "district": "Arevalo",
-    "location": [10.6812, 122.5204]
-  },
-  {
-    "id": "poi-lapaz-plaza",
-    "name": "Lapaz Plaza & Public Market",
-    "aliases": ["Lapaz Plaza", "Lapaz Market", "Batchoy Plaza"],
-    "category": "plaza",
-    "district": "Lapaz",
-    "location": [10.7103, 122.5719]
-  },
-  {
-    "id": "poi-robinsons-main",
-    "name": "Robinsons Place Iloilo",
-    "aliases": ["Robinsons", "Rob Main", "Quezon Wing"],
-    "category": "mall",
-    "district": "City Proper",
-    "location": [10.6976, 122.5684]
   },
   {
     "id": "poi-iloilo-esplanade",
@@ -115,16 +291,8 @@
     "id": "poi-provincial-capitol",
     "name": "Iloilo Provincial Capitol",
     "aliases": ["Capitol", "Casa Real de Iloilo", "Provincial Capitol"],
-    "category": "landmark",
+    "category": "government",
     "district": "City Proper",
-    "location": [10.7000, 122.5700]
-  },
-  {
-    "id": "poi-wvmc",
-    "name": "Western Visayas Medical Center (WVMC)",
-    "aliases": ["WVMC", "Western Hospital", "Mandurriao Hospital"],
-    "category": "hospital",
-    "district": "Mandurriao",
-    "location": [10.7078, 122.5412]
+    "location": [10.7, 122.57]
   }
 ]

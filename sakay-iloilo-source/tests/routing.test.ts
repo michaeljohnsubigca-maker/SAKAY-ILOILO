@@ -98,4 +98,38 @@ describe("Transit Routing Engine", () => {
     // Last option should be longest
     expect(results[results.length - 1].category).toBe("longest");
   });
+
+  it("generates road-curving multi-point coordinates for SM City to Festive Walk", () => {
+    const smCity: [number, number] = [10.7143, 122.5512];
+    const festiveWalk: [number, number] = [10.7186, 122.5453];
+
+    const results = findRoutes(smCity, festiveWalk, routes, "regular");
+    expect(results.length).toBeGreaterThan(0);
+
+    const bestOption = results[0];
+    const rideLeg = bestOption.legs.find((l) => l.type === "ride");
+    expect(rideLeg).toBeDefined();
+
+    // Must NOT be a 2-point straight diagonal line
+    expect(rideLeg!.coordinates.length).toBeGreaterThanOrEqual(10);
+
+    // First walk leg must end at ride leg first coordinate
+    const walk1 = bestOption.legs[0];
+    expect(walk1.coordinates[1]).toEqual(rideLeg!.coordinates[0]);
+  });
+
+  it("guarantees seamless curb-snapping across transfer legs", () => {
+    const cpu: [number, number] = [10.7314, 122.5539];
+    const festiveWalk: [number, number] = [10.7186, 122.5453];
+
+    const results = findRoutes(cpu, festiveWalk, routes, "regular");
+    const transferOption = results.find((r) => r.transfersCount === 1);
+    expect(transferOption).toBeDefined();
+
+    const [walk1, ride1, transferWalk, ride2, walkFinal] = transferOption!.legs;
+    expect(walk1.coordinates[1]).toEqual(ride1.coordinates[0]);
+    expect(transferWalk.coordinates[0]).toEqual(ride1.coordinates[ride1.coordinates.length - 1]);
+    expect(transferWalk.coordinates[1]).toEqual(ride2.coordinates[0]);
+    expect(walkFinal.coordinates[0]).toEqual(ride2.coordinates[ride2.coordinates.length - 1]);
+  });
 });

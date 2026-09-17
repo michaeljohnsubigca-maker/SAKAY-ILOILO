@@ -2,7 +2,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { TripOption, LandmarkPOI } from "@/types/transit";
+import { TripOption, LandmarkPOI, JeepneyRoute } from "@/types/transit";
 
 const DynamicLeafletMap = dynamic(() => import("./LeafletMap"), {
   ssr: false,
@@ -22,6 +22,7 @@ interface MapWrapperProps {
   originName?: string;
   destinationName?: string;
   selectedTrip: TripOption | null;
+  previewRoute?: JeepneyRoute | null;
   pois: LandmarkPOI[];
   onSelectPoi?: (poi: LandmarkPOI) => void;
   onMapClick?: (coords: [number, number]) => void;

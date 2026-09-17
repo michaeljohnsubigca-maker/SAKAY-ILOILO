@@ -36,6 +36,11 @@ function createWalkLeg(
   };
 }
 
+function isClosedLoopRoute(waypoints: [number, number][]): boolean {
+  if (waypoints.length < 10) return false;
+  return distanceBetweenMeters(waypoints[0], waypoints[waypoints.length - 1]) < 150;
+}
+
 function getDirectedPolylineSlice(
   waypoints: [number, number][],
   startIndex: number,
@@ -44,8 +49,20 @@ function getDirectedPolylineSlice(
   if (startIndex <= endIndex) {
     return waypoints.slice(startIndex, endIndex + 1);
   } else {
+    // If this is a circular loop route, follow forward through the terminal wrap-around
+    if (isClosedLoopRoute(waypoints)) {
+      return [...waypoints.slice(startIndex), ...waypoints.slice(0, endIndex + 1)];
+    }
     return waypoints.slice(endIndex, startIndex + 1).reverse();
   }
+}
+
+function calculateDirectedSliceDistanceMeters(coords: [number, number][]): number {
+  let total = 0;
+  for (let i = 0; i < coords.length - 1; i++) {
+    total += distanceBetweenMeters(coords[i], coords[i + 1]);
+  }
+  return total;
 }
 
 function findNearestStop(
@@ -96,22 +113,20 @@ export function findRoutes(
       const startIndex = originSnap.index;
       const endIndex = destSnap.index;
 
-      const rideDistMeters = calculatePolylineDistanceMeters(
+      const rideCoords = getDirectedPolylineSlice(
         route.waypoints,
         startIndex,
         endIndex
       );
+      const rideDistMeters = calculateDirectedSliceDistanceMeters(rideCoords);
 
       if (rideDistMeters > 0) {
         const boardStop = findNearestStop(startIndex, route);
         const alightStop = findNearestStop(endIndex, route);
+        const boardPoint = rideCoords[0];
+        const alightPoint = rideCoords[rideCoords.length - 1];
 
-        const walk1 = createWalkLeg(origin, boardStop.location, "Starting Point", boardStop.name);
-        const rideCoords = getDirectedPolylineSlice(
-          route.waypoints,
-          startIndex,
-          endIndex
-        );
+        const walk1 = createWalkLeg(origin, boardPoint, "Starting Point", boardStop.name);
         const rideDuration = Math.max(
           3,
           Math.round(rideDistMeters / (JEEPNEY_SPEED_MPS * 60))
@@ -129,7 +144,7 @@ export function findRoutes(
           coordinates: rideCoords,
         };
 
-        const walk2 = createWalkLeg(alightStop.location, destination, alightStop.name, "Destination");
+        const walk2 = createWalkLeg(alightPoint, destination, alightStop.name, "Destination");
 
         const totalDist = walk1.distanceMeters + rideLeg.distanceMeters + walk2.distanceMeters;
         const totalDuration = walk1.durationMinutes + rideLeg.durationMinutes + walk2.durationMinutes;
@@ -168,16 +183,19 @@ export function findRoutes(
 
             if (snapStopA.index === originSnapA.index || snapStopB.index === destSnapB.index) continue;
 
-            const ride1Dist = calculatePolylineDistanceMeters(
+            const ride1Coords = getDirectedPolylineSlice(
               routeA.waypoints,
               originSnapA.index,
               snapStopA.index
             );
-            const ride2Dist = calculatePolylineDistanceMeters(
+            const ride2Coords = getDirectedPolylineSlice(
               routeB.waypoints,
               snapStopB.index,
               destSnapB.index
             );
+
+            const ride1Dist = calculateDirectedSliceDistanceMeters(ride1Coords);
+            const ride2Dist = calculateDirectedSliceDistanceMeters(ride2Coords);
 
             if (ride1Dist > 200 && ride2Dist > 200) {
               const boardA = findNearestStop(originSnapA.index, routeA);
@@ -185,7 +203,13 @@ export function findRoutes(
               const boardB = stopB;
               const alightB = findNearestStop(destSnapB.index, routeB);
 
-              const walk1 = createWalkLeg(origin, boardA.location, "Starting Point", boardA.name);
+              const boardPointA = ride1Coords[0];
+              const alightPointA = ride1Coords[ride1Coords.length - 1];
+
+              const boardPointB = ride2Coords[0];
+              const alightPointB = ride2Coords[ride2Coords.length - 1];
+
+              const walk1 = createWalkLeg(origin, boardPointA, "Starting Point", boardA.name);
               const ride1: RideLeg = {
                 type: "ride",
                 route: routeA,
@@ -194,14 +218,10 @@ export function findRoutes(
                 fare: calculateFare(ride1Dist / 1000, routeA.fare, fareCategory),
                 boardStop: boardA,
                 alightStop: alightA,
-                coordinates: getDirectedPolylineSlice(
-                  routeA.waypoints,
-                  originSnapA.index,
-                  snapStopA.index
-                ),
+                coordinates: ride1Coords,
               };
 
-              const transferWalk = createWalkLeg(alightA.location, boardB.location, alightA.name, boardB.name);
+              const transferWalk = createWalkLeg(alightPointA, boardPointB, alightA.name, boardB.name);
               const ride2: RideLeg = {
                 type: "ride",
                 route: routeB,
@@ -210,14 +230,10 @@ export function findRoutes(
                 fare: calculateFare(ride2Dist / 1000, routeB.fare, fareCategory),
                 boardStop: boardB,
                 alightStop: alightB,
-                coordinates: getDirectedPolylineSlice(
-                  routeB.waypoints,
-                  snapStopB.index,
-                  destSnapB.index
-                ),
+                coordinates: ride2Coords,
               };
 
-              const walkFinal = createWalkLeg(alightB.location, destination, alightB.name, "Destination");
+              const walkFinal = createWalkLeg(alightPointB, destination, alightB.name, "Destination");
 
               const totalDuration =
                 walk1.durationMinutes +

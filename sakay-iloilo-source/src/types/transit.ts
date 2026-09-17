@@ -9,6 +9,7 @@ export interface JeepneyRoute {
   id: string;
   code: string; // e.g. "ROUTE 3"
   name: string; // e.g. "Ungka to City Proper via CPU"
+  corridorSummary?: string;
   type: "modern" | "traditional";
   color: string; // Hex color (e.g. "#2563eb")
   operatingHours: {
@@ -22,18 +23,30 @@ export interface JeepneyRoute {
     perKmDiscounted: number;
     baseKm: number;
   };
-  waypoints: [number, number][]; // [[lat, lng], ...]
   stops: RouteStop[];
+  waypoints: [number, number][]; // [[lat, lng], ...]
 }
 
-export interface LandmarkPOI {
+export type PoiCategory =
+  | "mall"
+  | "terminal"
+  | "school"
+  | "landmark"
+  | "hospital"
+  | "plaza"
+  | "government"
+  | "market";
+
+export interface Poi {
   id: string;
   name: string;
   aliases: string[];
-  category: "university" | "mall" | "hospital" | "plaza" | "terminal" | "landmark";
-  district: "City Proper" | "Jaro" | "Molo" | "Mandurriao" | "Lapaz" | "Arevalo" | "Lapuz";
+  category: PoiCategory;
+  district: "City Proper" | "Jaro" | "Molo" | "Mandurriao" | "Lapaz" | "Arevalo" | "Lapuz" | string;
   location: [number, number]; // [lat, lng]
 }
+
+export type LandmarkPOI = Poi;
 
 export type FareCategory = "regular" | "discounted";
 
@@ -69,8 +82,8 @@ export interface TripOption {
 }
 
 export interface TripPlanRequest {
-  origin: [number, number] | LandmarkPOI;
-  destination: [number, number] | LandmarkPOI;
+  origin: [number, number] | Poi;
+  destination: [number, number] | Poi;
   fareCategory?: FareCategory;
   departureTime?: string;
 }

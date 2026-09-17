@@ -3,8 +3,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { LandmarkPOI } from "@/types/transit";
-import { ArrowUpDown, MapPin, Locate } from "lucide-react";
+import { ArrowUpDown, MapPin, Locate, Search } from "lucide-react";
 import FrequentHubs from "./FrequentHubs";
+
+export type SearchTargetInput = "origin" | "destination";
 
 interface TripSearchProps {
   pois: LandmarkPOI[];
@@ -27,6 +29,24 @@ export function filterPois(query: string, pois: LandmarkPOI[]): LandmarkPOI[] {
   );
 }
 
+export function handleHubSelection(
+  hub: LandmarkPOI,
+  activeInput: SearchTargetInput,
+  onSelectOrigin: (name: string, coords: [number, number]) => void,
+  onSelectDestination: (name: string, coords: [number, number]) => void
+): { target: SearchTargetInput; name: string; location: [number, number] } {
+  if (activeInput === "origin") {
+    onSelectOrigin(hub.name, hub.location);
+  } else {
+    onSelectDestination(hub.name, hub.location);
+  }
+  return { target: activeInput, name: hub.name, location: hub.location };
+}
+
+export function getActiveTargetLabel(activeInput: SearchTargetInput): string {
+  return activeInput === "origin" ? "Setting Departure" : "Setting Destination";
+}
+
 export default function TripSearch({
   pois,
   originName,
@@ -36,22 +56,26 @@ export default function TripSearch({
   onSwap,
   onLocateUser,
 }: TripSearchProps) {
-  const [activeInput, setActiveInput] = useState<"origin" | "destination" | null>(null);
+  // Track active target input: "origin" | "destination"
+  const [activeInput, setActiveInput] = useState<SearchTargetInput>(
+    originName ? "destination" : "origin"
+  );
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!activeInput) return;
+    if (!isSearchOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setActiveInput(null);
+        setIsSearchOpen(false);
       }
     };
 
     const handleClickOutside = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        setActiveInput(null);
+        setIsSearchOpen(false);
       }
     };
 
@@ -62,17 +86,13 @@ export default function TripSearch({
       window.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [activeInput]);
+  }, [isSearchOpen]);
 
   const filteredPois = filterPois(searchQuery, pois);
 
   const handlePickPoi = (poi: LandmarkPOI) => {
-    if (activeInput === "origin") {
-      onSelectOrigin(poi.name, poi.location);
-    } else if (activeInput === "destination") {
-      onSelectDestination(poi.name, poi.location);
-    }
-    setActiveInput(null);
+    handleHubSelection(poi, activeInput, onSelectOrigin, onSelectDestination);
+    setIsSearchOpen(false);
     setSearchQuery("");
   };
 
@@ -81,40 +101,106 @@ export default function TripSearch({
       <div className="flex items-center gap-2">
         {/* Connector Dots */}
         <div className="flex flex-col items-center justify-between py-1.5 shrink-0 self-stretch">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span>
-          <div className="w-0.5 h-6 bg-slate-300 border-dashed"></div>
-          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-200"></span>
+          <span
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              activeInput === "origin"
+                ? "bg-emerald-500 ring-4 ring-emerald-200 scale-110"
+                : "bg-emerald-400 ring-2 ring-emerald-100"
+            }`}
+          />
+          <div className="w-0.5 h-6 bg-slate-300 border-dashed" />
+          <span
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              activeInput === "destination"
+                ? "bg-rose-500 ring-4 ring-rose-200 scale-110"
+                : "bg-rose-400 ring-2 ring-rose-100"
+            }`}
+          />
         </div>
 
         {/* Inputs */}
         <div className="flex-1 space-y-1.5">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveInput("origin");
-              setSearchQuery("");
-            }}
-            className="w-full text-left flex items-center justify-between bg-white px-2.5 py-1.5 rounded-md border border-slate-200 text-xs hover:border-blue-400 transition-colors"
+          {/* FROM INPUT ROW */}
+          <div
+            className={`flex items-center justify-between px-2.5 py-1.5 rounded-md border text-xs transition-all ${
+              activeInput === "origin"
+                ? "bg-emerald-50/70 border-emerald-500 ring-2 ring-emerald-500/30 shadow-xs"
+                : "bg-white border-slate-200 hover:border-slate-300"
+            }`}
           >
-            <span className="text-slate-400 text-[10px] font-bold mr-1.5 uppercase">FROM</span>
-            <span className="text-slate-800 font-semibold truncate flex-1 text-[11px]">
-              {originName || "Choose starting point"}
-            </span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setActiveInput("origin")}
+              onFocus={() => setActiveInput("origin")}
+              className="flex items-center flex-1 min-w-0 text-left mr-1 focus:outline-none"
+              aria-label="Set departure location as active target"
+            >
+              <span
+                className={`text-[10px] font-extrabold mr-1.5 uppercase shrink-0 ${
+                  activeInput === "origin" ? "text-emerald-700 font-black" : "text-slate-400"
+                }`}
+              >
+                FROM
+              </span>
+              <span className="text-slate-800 font-semibold truncate text-[11px]">
+                {originName || "Choose starting point"}
+              </span>
+            </button>
+            <button
+              type="button"
+              aria-label="Search departure landmarks"
+              title="Search all landmarks by name"
+              onClick={() => {
+                setActiveInput("origin");
+                setIsSearchOpen(true);
+                setSearchQuery("");
+              }}
+              className="p-1 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded transition-colors shrink-0"
+            >
+              <Search className="w-3.5 h-3.5" />
+            </button>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveInput("destination");
-              setSearchQuery("");
-            }}
-            className="w-full text-left flex items-center justify-between bg-white px-2.5 py-1.5 rounded-md border border-slate-200 text-xs hover:border-blue-400 transition-colors"
+          {/* TO INPUT ROW */}
+          <div
+            className={`flex items-center justify-between px-2.5 py-1.5 rounded-md border text-xs transition-all ${
+              activeInput === "destination"
+                ? "bg-rose-50/70 border-rose-500 ring-2 ring-rose-500/30 shadow-xs"
+                : "bg-white border-slate-200 hover:border-slate-300"
+            }`}
           >
-            <span className="text-slate-400 text-[10px] font-bold mr-1.5 uppercase">TO</span>
-            <span className="text-slate-900 font-bold truncate flex-1 text-[11px]">
-              {destinationName || "Choose destination"}
-            </span>
-          </button>
+            <button
+              type="button"
+              onClick={() => setActiveInput("destination")}
+              onFocus={() => setActiveInput("destination")}
+              className="flex items-center flex-1 min-w-0 text-left mr-1 focus:outline-none"
+              aria-label="Set destination location as active target"
+            >
+              <span
+                className={`text-[10px] font-extrabold mr-1.5 uppercase shrink-0 ${
+                  activeInput === "destination" ? "text-rose-700 font-black" : "text-slate-400"
+                }`}
+              >
+                TO
+              </span>
+              <span className="text-slate-900 font-bold truncate text-[11px]">
+                {destinationName || "Choose destination"}
+              </span>
+            </button>
+            <button
+              type="button"
+              aria-label="Search destination landmarks"
+              title="Search all landmarks by name"
+              onClick={() => {
+                setActiveInput("destination");
+                setIsSearchOpen(true);
+                setSearchQuery("");
+              }}
+              className="p-1 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded transition-colors shrink-0"
+            >
+              <Search className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
         {/* Actions */}
@@ -138,41 +224,55 @@ export default function TripSearch({
         </div>
       </div>
 
-      {/* Frequent Hubs Bar */}
+      {/* Target Indicator Header & Frequent Hubs Bar */}
       <div className="mt-2 pt-1 border-t border-slate-200/60">
+        <div className="flex items-center justify-between pb-1.5 text-[11px]">
+          <span className="text-slate-500 font-medium">1-Tap Quick Hubs</span>
+          <span
+            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold transition-all ${
+              activeInput === "origin"
+                ? "bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs"
+                : "bg-rose-100 text-rose-800 border border-rose-300 shadow-xs"
+            }`}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${
+                activeInput === "origin" ? "bg-emerald-600 animate-pulse" : "bg-rose-600 animate-pulse"
+              }`}
+            />
+            {getActiveTargetLabel(activeInput)}
+          </span>
+        </div>
+
         <FrequentHubs
           pois={pois}
           onSelectHub={(poi) => {
-            if (!originName) {
-              onSelectOrigin(poi.name, poi.location);
-            } else {
-              onSelectDestination(poi.name, poi.location);
-            }
+            handleHubSelection(poi, activeInput, onSelectOrigin, onSelectDestination);
           }}
         />
       </div>
 
       {/* Autocomplete Dropdown Modal */}
-      {activeInput && (
+      {isSearchOpen && (
         <>
           <div
             className="fixed inset-0 z-40 bg-black/20"
-            onClick={() => setActiveInput(null)}
+            onClick={() => setIsSearchOpen(false)}
             aria-hidden="true"
           />
           <div
             ref={modalRef}
-            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 p-2 z-50 max-h-64 overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 p-2.5 z-50 max-h-64 overflow-y-auto"
           >
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <span className="text-xs font-bold text-slate-700">
-                Select {activeInput === "origin" ? "Starting Point" : "Destination"}
+                Select {activeInput === "origin" ? "Starting Point (Departure)" : "Destination"}
               </span>
               <button
                 type="button"
                 aria-label="Close"
-                onClick={() => setActiveInput(null)}
-                className="text-xs text-slate-400 hover:text-slate-600 font-bold"
+                onClick={() => setIsSearchOpen(false)}
+                className="text-xs text-slate-400 hover:text-slate-600 font-bold p-1"
               >
                 ✕
               </button>
@@ -184,7 +284,7 @@ export default function TripSearch({
               placeholder="Search landmarks (CPU, SM City, Festive, Plazas)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full text-xs p-2 mt-1.5 border border-slate-200 rounded-md focus:outline-none focus:border-blue-600"
+              className="w-full text-xs p-2 mt-2 border border-slate-200 rounded-md focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-500"
             />
             <div className="mt-2 space-y-1">
               {searchQuery.trim() && filteredPois.length === 0 ? (
@@ -197,7 +297,7 @@ export default function TripSearch({
                     key={poi.id}
                     type="button"
                     onClick={() => handlePickPoi(poi)}
-                    className="w-full text-left px-2.5 py-1.5 rounded-md hover:bg-slate-50 flex items-center justify-between text-xs"
+                    className="w-full text-left px-2.5 py-1.5 rounded-md hover:bg-slate-50 flex items-center justify-between text-xs transition-colors"
                   >
                     <div>
                       <p className="font-semibold text-slate-800">{poi.name}</p>

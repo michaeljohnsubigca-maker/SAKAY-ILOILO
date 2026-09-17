@@ -1,163 +1,223 @@
-// src/components/map/LeafletMap.tsx                                                                                                                                                                                                      
-    "use client";                                                                                                                                                                                                                             
-                                                                                                                                                                                                                                              
-    import { useEffect, useRef } from "react";                                                                                                                                                                                                
-    import L from "leaflet";                                                                                                                                                                                                                  
-    import "leaflet/dist/leaflet.css";                                                                                                                                                                                                        
-    import { TripOption, LandmarkPOI } from "@/types/transit";                                                                                                                                                                                
-    import { getMarkerSvgString } from "./markers";                                                                                                                                                                                           
-                                                                                                                                                                                                                                              
-    interface LeafletMapProps {                                                                                                                                                                                                               
-      origin: [number, number] | null;                                                                                                                                                                                                        
-      destination: [number, number] | null;                                                                                                                                                                                                   
-      originName?: string;                                                                                                                                                                                                                    
-      destinationName?: string;                                                                                                                                                                                                               
-      selectedTrip: TripOption | null;                                                                                                                                                                                                        
-      pois: LandmarkPOI[];                                                                                                                                                                                                                    
-      onSelectPoi?: (poi: LandmarkPOI) => void;                                                                                                                                                                                               
-      onMapClick?: (coords: [number, number]) => void;                                                                                                                                                                                        
-    }                                                                                                                                                                                                                                         
-                                                                                                                                                                                                                                              
-    export default function LeafletMap({                                                                                                                                                                                                      
-      origin,                                                                                                                                                                                                                                 
-      destination,                                                                                                                                                                                                                            
-      originName = "Origin",                                                                                                                                                                                                                  
-      destinationName = "Destination",                                                                                                                                                                                                        
-      selectedTrip,                                                                                                                                                                                                                           
-      pois,                                                                                                                                                                                                                                   
-      onSelectPoi,                                                                                                                                                                                                                            
-      onMapClick,                                                                                                                                                                                                                             
-    }: LeafletMapProps) {                                                                                                                                                                                                                     
-      const mapRef = useRef<HTMLDivElement>(null);                                                                                                                                                                                            
-      const mapInstanceRef = useRef<L.Map | null>(null);                                                                                                                                                                                      
-      const layersRef = useRef<L.LayerGroup | null>(null);                                                                                                                                                                                    
-      const onMapClickRef = useRef(onMapClick);                                                                                                                                                                                               
-                                                                                                                                                                                                                                              
-      useEffect(() => {                                                                                                                                                                                                                       
-        onMapClickRef.current = onMapClick;                                                                                                                                                                                                   
-      }, [onMapClick]);                                                                                                                                                                                                                       
-                                                                                                                                                                                                                                              
-      // Initialize Map                                                                                                                                                                                                                       
-      useEffect(() => {                                                                                                                                                                                                                       
-        if (!mapRef.current || mapInstanceRef.current) return;                                                                                                                                                                                
-                                                                                                                                                                                                                                              
-        // Centered at Iloilo City                                                                                                                                                                                                            
-        const map = L.map(mapRef.current, {                                                                                                                                                                                                   
-          center: [10.7202, 122.5621],                                                                                                                                                                                                        
-          zoom: 14,                                                                                                                                                                                                                           
-          zoomControl: false,                                                                                                                                                                                                                 
-        });                                                                                                                                                                                                                                   
-                                                                                                                                                                                                                                              
-        // OpenStreetMap standard tiles (100% free, zero API key required)                                                                                                                                                                    
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {                                                                                                                                                                   
-          attribution:                                                                                                                                                                                                                        
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',                                                                                                                                        
-          maxZoom: 19,                                                                                                                                                                                                                        
-        }).addTo(map);                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                              
-        const layers = L.layerGroup().addTo(map);                                                                                                                                                                                             
-        layersRef.current = layers;                                                                                                                                                                                                           
-        mapInstanceRef.current = map;                                                                                                                                                                                                         
-                                                                                                                                                                                                                                              
-        map.on("click", (e) => {                                                                                                                                                                                                              
-          if (onMapClickRef.current) {                                                                                                                                                                                                        
-            onMapClickRef.current([e.latlng.lat, e.latlng.lng]);                                                                                                                                                                              
-          }                                                                                                                                                                                                                                   
-        });                                                                                                                                                                                                                                   
-                                                                                                                                                                                                                                              
-        return () => {                                                                                                                                                                                                                        
-          map.remove();                                                                                                                                                                                                                       
-          mapInstanceRef.current = null;                                                                                                                                                                                                      
-          layersRef.current = null;                                                                                                                                                                                                           
-        };                                                                                                                                                                                                                                    
-      }, []);                                                                                                                                                                                                                                 
-                                                                                                                                                                                                                                              
-      // Update Route Polylines and Markers                                                                                                                                                                                                   
-      useEffect(() => {                                                                                                                                                                                                                       
-        const map = mapInstanceRef.current;                                                                                                                                                                                                   
-        const layers = layersRef.current;                                                                                                                                                                                                     
-        if (!map || !layers) return;                                                                                                                                                                                                          
-                                                                                                                                                                                                                                              
-        layers.clearLayers();                                                                                                                                                                                                                 
-                                                                                                                                                                                                                                              
-        const bounds = L.latLngBounds([]);                                                                                                                                                                                                    
-                                                                                                                                                                                                                                              
-        // 1. Render Origin Pin                                                                                                                                                                                                               
-        if (origin) {                                                                                                                                                                                                                         
-          const originIcon = L.divIcon({                                                                                                                                                                                                      
-            className: "custom-div-icon !bg-transparent !border-0",                                                                                                                                                                           
-            html: getMarkerSvgString("origin", originName),                                                                                                                                                                                   
-            iconSize: [20, 20],                                                                                                                                                                                                               
-            iconAnchor: [10, 10],                                                                                                                                                                                                             
-          });                                                                                                                                                                                                                                 
-          L.marker(origin, { icon: originIcon }).addTo(layers);                                                                                                                                                                               
-          bounds.extend(origin);                                                                                                                                                                                                              
-        }                                                                                                                                                                                                                                     
-                                                                                                                                                                                                                                              
-        // 2. Render Destination Pin                                                                                                                                                                                                          
-        if (destination) {                                                                                                                                                                                                                    
-          const destIcon = L.divIcon({                                                                                                                                                                                                        
-            className: "custom-div-icon !bg-transparent !border-0",                                                                                                                                                                           
-            html: getMarkerSvgString("destination", destinationName),                                                                                                                                                                         
-            iconSize: [20, 20],                                                                                                                                                                                                               
-            iconAnchor: [10, 10],                                                                                                                                                                                                             
-          });                                                                                                                                                                                                                                 
-          L.marker(destination, { icon: destIcon }).addTo(layers);                                                                                                                                                                            
-          bounds.extend(destination);                                                                                                                                                                                                         
-        }                                                                                                                                                                                                                                     
-                                                                                                                                                                                                                                              
-        // 3. Render Selected Trip Polylines & Transfer Nodes                                                                                                                                                                                 
-        if (selectedTrip) {                                                                                                                                                                                                                   
-          let rideIndex = 0;                                                                                                                                                                                                                  
-          for (const leg of selectedTrip.legs) {                                                                                                                                                                                              
-            if (leg.type === "walk") {                                                                                                                                                                                                        
-              L.polyline(leg.coordinates, {                                                                                                                                                                                                   
-                color: "#3b82f6",                                                                                                                                                                                                             
-                weight: 4,                                                                                                                                                                                                                    
-                dashArray: "6, 6",                                                                                                                                                                                                            
-                opacity: 0.9,                                                                                                                                                                                                                 
-              }).addTo(layers);                                                                                                                                                                                                               
-              leg.coordinates.forEach((c) => bounds.extend(c));                                                                                                                                                                               
-            } else if (leg.type === "ride") {                                                                                                                                                                                                 
-              // If this is a transfer (subsequent ride leg), render amber transfer marker                                                                                                                                                    
-              if (rideIndex > 0 && leg.boardStop) {                                                                                                                                                                                           
-                const transferIcon = L.divIcon({                                                                                                                                                                                              
-                  className: "custom-div-icon !bg-transparent !border-0",                                                                                                                                                                     
-                  html: getMarkerSvgString("transfer", leg.boardStop.name),                                                                                                                                                                   
-                  iconSize: [20, 20],                                                                                                                                                                                                         
-                  iconAnchor: [10, 10],                                                                                                                                                                                                       
-                });                                                                                                                                                                                                                           
-                L.marker(leg.boardStop.location, { icon: transferIcon }).addTo(layers);                                                                                                                                                       
-              }                                                                                                                                                                                                                               
-              rideIndex++;                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                              
-              // Glow effect                                                                                                                                                                                                                  
-              L.polyline(leg.coordinates, {                                                                                                                                                                                                   
-                color: leg.route.color || "#2563eb",                                                                                                                                                                                          
-                weight: 12,                                                                                                                                                                                                                   
-                opacity: 0.25,                                                                                                                                                                                                                
-                lineCap: "round",                                                                                                                                                                                                             
-              }).addTo(layers);                                                                                                                                                                                                               
-                                                                                                                                                                                                                                              
-              // Solid line                                                                                                                                                                                                                   
-              L.polyline(leg.coordinates, {                                                                                                                                                                                                   
-                color: leg.route.color || "#2563eb",                                                                                                                                                                                          
-                weight: 6,                                                                                                                                                                                                                    
-                opacity: 0.95,                                                                                                                                                                                                                
-                lineCap: "round",                                                                                                                                                                                                             
-                lineJoin: "round",                                                                                                                                                                                                            
-              }).addTo(layers);                                                                                                                                                                                                               
-                                                                                                                                                                                                                                              
-              leg.coordinates.forEach((c) => bounds.extend(c));                                                                                                                                                                               
-            }                                                                                                                                                                                                                                 
-          }                                                                                                                                                                                                                                   
-        }                                                                                                                                                                                                                                     
-                                                                                                                                                                                                                                              
-        // Adjust zoom if points are present                                                                                                                                                                                                  
-        if (bounds.isValid()) {                                                                                                                                                                                                               
-          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });                                                                                                                                                                          
-        }                                                                                                                                                                                                                                     
-      }, [origin, destination, originName, destinationName, selectedTrip]);                                                                                                                                                                   
-                                                                                                                                                                                                                                              
-      return <div ref={mapRef} className="w-full h-full bg-[#f1f5f9] select-none" />;                                                                                                                                                         
+// src/components/map/LeafletMap.tsx
+"use client";
+
+import { useEffect, useRef } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { TripOption, LandmarkPOI, JeepneyRoute } from "@/types/transit";
+import { getMarkerSvgString } from "./markers";
+
+interface LeafletMapProps {
+  origin: [number, number] | null;
+  destination: [number, number] | null;
+  originName?: string;
+  destinationName?: string;
+  selectedTrip: TripOption | null;
+  previewRoute?: JeepneyRoute | null;
+  pois: LandmarkPOI[];
+  onSelectPoi?: (poi: LandmarkPOI) => void;
+  onMapClick?: (coords: [number, number]) => void;
+}
+
+export default function LeafletMap({
+  origin,
+  destination,
+  originName = "Origin",
+  destinationName = "Destination",
+  selectedTrip,
+  previewRoute,
+  pois,
+  onSelectPoi,
+  onMapClick,
+}: LeafletMapProps) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const layersRef = useRef<L.LayerGroup | null>(null);
+  const onMapClickRef = useRef(onMapClick);
+
+  useEffect(() => {
+    onMapClickRef.current = onMapClick;
+  }, [onMapClick]);
+
+  // Initialize Map
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    // Centered at Iloilo City
+    const map = L.map(mapRef.current, {
+      center: [10.7202, 122.5621],
+      zoom: 14,
+      zoomControl: false,
+    });
+
+    // OpenStreetMap standard tiles (100% free, zero API key required)
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    const layers = L.layerGroup().addTo(map);
+    layersRef.current = layers;
+    mapInstanceRef.current = map;
+
+    map.on("click", (e) => {
+      if (onMapClickRef.current) {
+        onMapClickRef.current([e.latlng.lat, e.latlng.lng]);
+      }
+    });
+
+    return () => {
+      map.remove();
+      mapInstanceRef.current = null;
+      layersRef.current = null;
+    };
+  }, []);
+
+  // Update Route Polylines and Markers
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const layers = layersRef.current;
+    if (!map || !layers) return;
+
+    layers.clearLayers();
+
+    const bounds = L.latLngBounds([]);
+
+    // 1. Render Origin Pin (only when not inspecting a route)
+    if (origin && !previewRoute) {
+      const originIcon = L.divIcon({
+        className: "custom-div-icon !bg-transparent !border-0",
+        html: getMarkerSvgString("origin", originName),
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+      });
+      L.marker(origin, { icon: originIcon }).addTo(layers);
+      bounds.extend(origin);
     }
+
+    // 2. Render Destination Pin (only when not inspecting a route)
+    if (destination && !previewRoute) {
+      const destIcon = L.divIcon({
+        className: "custom-div-icon !bg-transparent !border-0",
+        html: getMarkerSvgString("destination", destinationName),
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+      });
+      L.marker(destination, { icon: destIcon }).addTo(layers);
+      bounds.extend(destination);
+    }
+
+    // 3. Render Selected Trip Polylines & Transfer Nodes
+    if (selectedTrip) {
+      let rideIndex = 0;
+      for (const leg of selectedTrip.legs) {
+        if (leg.type === "walk") {
+          L.polyline(leg.coordinates, {
+            color: "#3b82f6",
+            weight: 4,
+            dashArray: "6, 6",
+            opacity: 0.9,
+          }).addTo(layers);
+          leg.coordinates.forEach((c) => bounds.extend(c));
+        } else if (leg.type === "ride") {
+          // If this is a transfer (subsequent ride leg), render amber transfer marker
+          if (rideIndex > 0 && leg.boardStop) {
+            const transferIcon = L.divIcon({
+              className: "custom-div-icon !bg-transparent !border-0",
+              html: getMarkerSvgString("transfer", leg.boardStop.name),
+              iconSize: [20, 20],
+              iconAnchor: [10, 10],
+            });
+            L.marker(leg.boardStop.location, { icon: transferIcon }).addTo(layers);
+          }
+          rideIndex++;
+
+          // Glow effect
+          L.polyline(leg.coordinates, {
+            color: leg.route.color || "#2563eb",
+            weight: 12,
+            opacity: 0.25,
+            lineCap: "round",
+          }).addTo(layers);
+
+          // Solid line
+          L.polyline(leg.coordinates, {
+            color: leg.route.color || "#2563eb",
+            weight: 6,
+            opacity: 0.95,
+            lineCap: "round",
+            lineJoin: "round",
+          }).addTo(layers);
+
+          leg.coordinates.forEach((c) => bounds.extend(c));
+        }
+      }
+    } else if (previewRoute) {
+      // 4. Render Preview Route (Route Inspection Mode)
+      const routeColor = previewRoute.color || "#2563eb";
+      const routeBounds = L.latLngBounds([]);
+
+      // Glowing background line
+      L.polyline(previewRoute.waypoints, {
+        color: routeColor,
+        weight: 12,
+        opacity: 0.25,
+        lineCap: "round",
+      }).addTo(layers);
+
+      // Foreground solid line
+      L.polyline(previewRoute.waypoints, {
+        color: routeColor,
+        weight: 6,
+        opacity: 0.95,
+        lineCap: "round",
+        lineJoin: "round",
+      }).addTo(layers);
+
+      previewRoute.waypoints.forEach((c) => {
+        bounds.extend(c);
+        routeBounds.extend(c);
+      });
+
+      // Markers at each stop in previewRoute.stops
+      previewRoute.stops?.forEach((stop, index) => {
+        const isTerminal = index === 0 || index === previewRoute.stops.length - 1;
+        const stopIcon = L.divIcon({
+          className: "custom-div-icon !bg-transparent !border-0",
+          html: getMarkerSvgString("stop", stop.name, {
+            color: routeColor,
+            isMajorHub: stop.isMajorHub,
+            isTerminal,
+          }),
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
+        });
+
+        const marker = L.marker(stop.location, { icon: stopIcon }).addTo(layers);
+        marker.bindPopup(`
+          <div class="p-1 font-sans text-xs">
+            <div class="font-bold text-slate-900">${stop.name}</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">
+              ${previewRoute.code} • Stop ${index + 1} of ${previewRoute.stops.length}
+              ${stop.isMajorHub ? " • Major Hub" : ""}
+            </div>
+          </div>
+        `);
+      });
+
+      // Fit map bounds to previewRoute.waypoints
+      if (routeBounds.isValid()) {
+        map.fitBounds(routeBounds, { padding: [50, 50], maxZoom: 16 });
+        return;
+      }
+    }
+
+    // Adjust zoom if points are present
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
+    }
+  }, [origin, destination, originName, destinationName, selectedTrip, previewRoute]);
+
+  return <div ref={mapRef} className="w-full h-full bg-[#f1f5f9] select-none" />;
+}
