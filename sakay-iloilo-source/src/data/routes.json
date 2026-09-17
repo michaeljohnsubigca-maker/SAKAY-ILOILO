@@ -1,0 +1,168 @@
+[
+  {
+    "id": "route-3-ungka-cpu-city-proper",
+    "code": "ROUTE 3",
+    "name": "Ungka to City Proper via CPU",
+    "type": "modern",
+    "color": "#2563eb",
+    "operatingHours": {
+      "firstTrip": "04:30",
+      "lastTrip": "22:30"
+    },
+    "fare": {
+      "baseFareRegular": 15.0,
+      "baseFareDiscounted": 12.0,
+      "perKmRegular": 2.0,
+      "perKmDiscounted": 1.6,
+      "baseKm": 4.0
+    },
+    "waypoints": [
+      [10.7485, 122.5446],
+      [10.7420, 122.5490],
+      [10.7314, 122.5539],
+      [10.7247, 122.5579],
+      [10.7180, 122.5620],
+      [10.7090, 122.5670],
+      [10.6976, 122.5684],
+      [10.6928, 122.5714]
+    ],
+    "stops": [
+      { "id": "r3-stop-1", "name": "Ungka Terminal", "location": [10.7485, 122.5446], "isMajorHub": true },
+      { "id": "r3-stop-2", "name": "CPU Gate 1 (Lopez Jaena)", "location": [10.7314, 122.5539], "isMajorHub": true },
+      { "id": "r3-stop-3", "name": "Jaro Plaza / Cathedral", "location": [10.7247, 122.5579], "isMajorHub": true },
+      { "id": "r3-stop-4", "name": "Robinsons Place Iloilo", "location": [10.6976, 122.5684], "isMajorHub": false },
+      { "id": "r3-stop-5", "name": "Plaza Libertad Terminal", "location": [10.6928, 122.5714], "isMajorHub": true }
+    ]
+  },
+  {
+    "id": "route-5-festive-sm-city-proper",
+    "code": "ROUTE 5",
+    "name": "Festive Walk to City Proper via SM City & Diversion",
+    "type": "modern",
+    "color": "#10b981",
+    "operatingHours": {
+      "firstTrip": "05:00",
+      "lastTrip": "22:00"
+    },
+    "fare": {
+      "baseFareRegular": 15.0,
+      "baseFareDiscounted": 12.0,
+      "perKmRegular": 2.0,
+      "perKmDiscounted": 1.6,
+      "baseKm": 4.0
+    },
+    "waypoints": [
+      [10.7186, 122.5453],
+      [10.7143, 122.5512],
+      [10.7107, 122.5492],
+      [10.7040, 122.5560],
+      [10.6980, 122.5620],
+      [10.6928, 122.5714]
+    ],
+    "stops": [
+      { "id": "r5-stop-1", "name": "Festive Walk Transport Hub", "location": [10.7186, 122.5453], "isMajorHub": true },
+      { "id": "r5-stop-2", "name": "SM City Iloilo Overpass", "location": [10.7143, 122.5512], "isMajorHub": true },
+      { "id": "r5-stop-3", "name": "Atria District Loading Bay", "location": [10.7107, 122.5492], "isMajorHub": false },
+      { "id": "r5-stop-4", "name": "General Luna St.", "location": [10.6980, 122.5620], "isMajorHub": false },
+      { "id": "r5-stop-5", "name": "Plaza Libertad", "location": [10.6928, 122.5714], "isMajorHub": true }
+    ]
+  },
+  {
+    "id": "route-4-ungka-diversion-city-proper",
+    "code": "ROUTE 4",
+    "name": "Ungka to City Proper via Diversion Road",
+    "type": "traditional",
+    "color": "#f59e0b",
+    "operatingHours": {
+      "firstTrip": "04:30",
+      "lastTrip": "21:30"
+    },
+    "fare": {
+      "baseFareRegular": 13.0,
+      "baseFareDiscounted": 10.5,
+      "perKmRegular": 1.8,
+      "perKmDiscounted": 1.45,
+      "baseKm": 4.0
+    },
+    "waypoints": [
+      [10.7485, 122.5446],
+      [10.7300, 122.5470],
+      [10.7143, 122.5512],
+      [10.7050, 122.5580],
+      [10.6976, 122.5684],
+      [10.6928, 122.5714]
+    ],
+    "stops": [
+      { "id": "r4-stop-1", "name": "Ungka Terminal", "location": [10.7485, 122.5446], "isMajorHub": true },
+      { "id": "r4-stop-2", "name": "Diversion El 98 Junction", "location": [10.7300, 122.5470], "isMajorHub": false },
+      { "id": "r4-stop-3", "name": "SM City Iloilo", "location": [10.7143, 122.5512], "isMajorHub": true },
+      { "id": "r4-stop-4", "name": "UP Visayas / Gen Luna", "location": [10.6974, 122.5647], "isMajorHub": true },
+      { "id": "r4-stop-5", "name": "Plaza Libertad", "location": [10.6928, 122.5714], "isMajorHub": true }
+    ]
+  },
+  {
+    "id": "route-13-mohon-villa-city-proper",
+    "code": "ROUTE 13",
+    "name": "Mohon Terminal to City Proper via Villa Arevalo",
+    "type": "modern",
+    "color": "#8b5cf6",
+    "operatingHours": {
+      "firstTrip": "05:00",
+      "lastTrip": "22:00"
+    },
+    "fare": {
+      "baseFareRegular": 15.0,
+      "baseFareDiscounted": 12.0,
+      "perKmRegular": 2.0,
+      "perKmDiscounted": 1.6,
+      "baseKm": 4.0
+    },
+    "waypoints": [
+      [10.6812, 122.5204],
+      [10.6890, 122.5320],
+      [10.6961, 122.5432],
+      [10.6974, 122.5647],
+      [10.6928, 122.5714]
+    ],
+    "stops": [
+      { "id": "r13-stop-1", "name": "Mohon Terminal", "location": [10.6812, 122.5204], "isMajorHub": true },
+      { "id": "r13-stop-2", "name": "Villa Plaza", "location": [10.6890, 122.5320], "isMajorHub": false },
+      { "id": "r13-stop-3", "name": "Molo Plaza", "location": [10.6961, 122.5432], "isMajorHub": true },
+      { "id": "r13-stop-4", "name": "UP Visayas City Campus", "location": [10.6974, 122.5647], "isMajorHub": true },
+      { "id": "r13-stop-5", "name": "Plaza Libertad", "location": [10.6928, 122.5714], "isMajorHub": true }
+    ]
+  },
+  {
+    "id": "route-10-tagbak-lapaz-city-proper",
+    "code": "ROUTE 10",
+    "name": "Tagbak Terminal to City Proper via Lapaz",
+    "type": "modern",
+    "color": "#ec4899",
+    "operatingHours": {
+      "firstTrip": "04:30",
+      "lastTrip": "22:30"
+    },
+    "fare": {
+      "baseFareRegular": 15.0,
+      "baseFareDiscounted": 12.0,
+      "perKmRegular": 2.0,
+      "perKmDiscounted": 1.6,
+      "baseKm": 4.0
+    },
+    "waypoints": [
+      [10.7583, 122.5658],
+      [10.7400, 122.5670],
+      [10.7247, 122.5579],
+      [10.7103, 122.5719],
+      [10.7000, 122.5700],
+      [10.6928, 122.5714]
+    ],
+    "stops": [
+      { "id": "r10-stop-1", "name": "Tagbak Terminal", "location": [10.7583, 122.5658], "isMajorHub": true },
+      { "id": "r10-stop-2", "name": "Jaro Plaza Interchange", "location": [10.7247, 122.5579], "isMajorHub": true },
+      { "id": "r10-stop-3", "name": "Lapaz Plaza & Market", "location": [10.7103, 122.5719], "isMajorHub": true },
+      { "id": "r10-stop-4", "name": "Iloilo Provincial Capitol", "location": [10.7000, 122.5700], "isMajorHub": false },
+      { "id": "r10-stop-5", "name": "Plaza Libertad Terminal", "location": [10.6928, 122.5714], "isMajorHub": true }
+    ]
+  }
+]

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>SakayIloilo - Iloilo Jeepney Route Planner &amp; Live Map</title>
+<!-- Tailwind CSS v3 with Forms & Container Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a'
+            },
+            jeepAmber: '#f59e0b',
+            trafficEmerald: '#10b981',
+            slateNavy: '#0f172a'
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+          },
+          boxShadow: {
+            'map-float': '0 4px 20px -2px rgba(15, 23, 42, 0.12), 0 2px 6px -1px rgba(15, 23, 42, 0.08)',
+            'sheet': '0 -10px 30px -5px rgba(15, 23, 42, 0.15)'
+          }
+        }
+      }
+    }
+  </script>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Core layout CSS -->
+<style data-purpose="mobile-viewport-reset">
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    body {
+      touch-action: pan-x pan-y;
+      background-color: #e5e9f0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<!-- Map styling & vector lines -->
+<style data-purpose="map-visual-styling">
+    .map-container {
+      background: radial-gradient(circle at 75% 25%, #f4f6fa 0%, #e9ecf2 100%);
+      background-color: #f1f5f9;
+    }
+    .river-body {
+      stroke: #bdd3f0;
+      stroke-width: 22;
+      stroke-linecap: round;
+      fill: none;
+    }
+    .river-label {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      fill: #60a5fa;
+      opacity: 0.85;
+      text-transform: uppercase;
+    }
+    .road-arterial {
+      stroke: #ffffff;
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .road-border {
+      stroke: #d7dde6;
+      stroke-width: 16;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .road-secondary {
+      stroke: #ffffff;
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .transit-route-glow {
+      stroke: rgba(37, 99, 235, 0.25);
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .transit-route {
+      stroke: #2563eb;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .walking-dash {
+      stroke: #3b82f6;
+      stroke-width: 3.5;
+      stroke-dasharray: 4, 4;
+      stroke-linecap: round;
+      fill: none;
+    }
+    .pulse-ring {
+      animation: mapPulse 2s infinite ease-out;
+    }
+    @keyframes mapPulse {
+      0% { r: 6; opacity: 0.8; }
+      100% { r: 18; opacity: 0; }
+    }
+  </style>
+</head>
+<body class="w-full h-screen overflow-hidden flex justify-center bg-slate-900">
+<!-- Mobile Simulator Frame (iPhone 14/15 size: 390px - 414px) -->
+<div class="relative w-full max-w-[420px] h-full overflow-hidden bg-slate-100 flex flex-col shadow-2xl">
+<!-- BEGIN: TopStatusBarAndHeader -->
+<header class="relative z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-3.5 pt-2 pb-2.5 shadow-sm transition-all">
+<!-- Top Row: SakayIloilo Logo & Fare Category Pill -->
+<div class="flex items-center justify-between gap-2 mb-2">
+<!-- SakayIloilo Brandmark from provided image markup -->
+<div class="flex items-center gap-1.5" data-purpose="app-branding">
+<div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center p-1 shadow-sm shrink-0">
+<svg class="w-full h-full" fill="none" viewbox="0 0 44 44">
+<!-- Route Pin -->
+<path d="M22 6C20.3 6 19 7.3 19 9C19 11.2 22 14 22 14C22 14 25 11.2 25 9C25 7.3 23.7 6 22 6Z" fill="#10B981"></path>
+<!-- Windshield -->
+<path d="M12 16C12 13.8 13.8 12 16 12H28C30.2 12 32 13.8 32 16V24H12V16Z" fill="#FFFFFF"></path>
+<!-- Bumper -->
+<path d="M10 27H34V31C34 33.2 32.2 35 30 35H14C11.8 35 10 33.2 10 31V27Z" fill="#F59E0B"></path>
+<!-- Headlights -->
+<circle cx="15" cy="31" fill="#FFFFFF" r="2.5"></circle>
+<circle cx="29" cy="31" fill="#FFFFFF" r="2.5"></circle>
+<rect fill="#1E293B" height="5" rx="1" width="10" x="17" y="15"></rect>
+</svg>
+</div>
+<div>
+<div class="flex items-center gap-1">
+<span class="text-base font-extrabold tracking-tight text-slate-900 leading-none">Sakay<span class="text-blue-600">Iloilo</span></span>
+<span class="text-[9px] font-bold bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200">LPTRP</span>
+</div>
+<p class="text-[9px] font-bold tracking-wider text-slate-500 uppercase leading-none mt-0.5">Iloilo City PUV Guide</p>
+</div>
+</div>
+<!-- Fare Toggle: Regular vs Student/PWD/Senior -->
+<div class="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-semibold" data-purpose="fare-category-selector">
+<button class="px-2 py-1 rounded-md bg-white text-blue-700 shadow-xs font-bold transition-colors" type="button">
+            Regular
+          </button>
+<button class="px-2 py-1 text-slate-500 hover:text-slate-700 transition-colors" type="button">
+            Discounted
+          </button>
+</div>
+</div>
+<!-- Quick Origin / Destination Compact Card -->
+<div class="bg-slate-50/90 rounded-xl border border-slate-200/90 p-2 relative shadow-inner" data-purpose="route-search-pills">
+<div class="flex items-center gap-2">
+<!-- Connector Dots Indicator -->
+<div class="flex flex-col items-center justify-between py-1 shrink-0 self-stretch">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span>
+<div class="w-0.5 h-4 bg-slate-300 border-dashed"></div>
+<span class="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-200"></span>
+</div>
+<!-- Input labels / Selectors -->
+<div class="flex-1 space-y-1">
+<div class="flex items-center justify-between bg-white px-2.5 py-1 rounded-md border border-slate-200 text-xs">
+<span class="text-slate-400 text-[10px] font-medium mr-1.5">FROM</span>
+<span class="text-slate-800 font-semibold truncate flex-1 text-[11px]">CPU Gate 1 (Lopez Jaena, Jaro)</span>
+</div>
+<div class="flex items-center justify-between bg-white px-2.5 py-1 rounded-md border border-slate-200 text-xs">
+<span class="text-slate-400 text-[10px] font-medium mr-1.5">TO</span>
+<span class="text-slate-900 font-bold truncate flex-1 text-[11px]">SM City Iloilo (Mandurriao)</span>
+</div>
+</div>
+<!-- Swap Direction Button -->
+<button aria-label="Swap route direction" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-xs text-blue-600 flex items-center justify-center hover:bg-blue-50 active:scale-95 transition-transform shrink-0" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<!-- Frequent Hub Badges (Horizontal scroll) -->
+<div class="flex items-center gap-1.5 mt-2 overflow-x-auto hide-scrollbar pt-0.5 text-[10px]">
+<span class="text-slate-400 text-[9px] font-bold uppercase shrink-0">Hubs:</span>
+<span class="px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-2xs">Festive Walk</span>
+<span class="px-2 py-0.5 rounded-full bg-blue-100/70 border border-blue-300 text-blue-800 font-semibold whitespace-nowrap">SM City</span>
+<span class="px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-2xs">Jaro Plaza</span>
+<span class="px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-2xs">Tagbak</span>
+<span class="px-2 py-0.5 rounded-full bg-white border border-slate-200 text-slate-700 font-medium whitespace-nowrap shadow-2xs">Mohon</span>
+</div>
+</div>
+<!-- Live Service Status Pill -->
+<div class="flex items-center justify-between mt-1.5 px-1 text-[10px] text-slate-600 font-medium">
+<div class="flex items-center gap-1.5">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+<span>Live PUV Operations: <strong class="text-slate-800">4:30 AM – 10:30 PM</strong></span>
+</div>
+<div class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+          Diversion: Moderate Flow
+        </div>
+</div>
+</header>
+<!-- END: TopStatusBarAndHeader -->
+<!-- BEGIN: MapViewport -->
+<main class="relative flex-1 w-full h-full overflow-hidden map-container" data-purpose="interactive-transit-map">
+<!-- Full Vector Canvas / SVG Map representation matching Iloilo City Cartography -->
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="xMidYMid slice" viewbox="0 0 390 600" xmlns="http://www.w3.org/2000/svg">
+<!-- District Areas (Soft Background Fills) -->
+<!-- Mandurriao Sector -->
+<path d="M 120,240 L 260,220 L 270,360 L 130,380 Z" fill="#fef08a" fill-opacity="0.15"></path>
+<!-- Jaro Sector -->
+<path d="M 240,40 L 390,30 L 390,200 L 270,220 Z" fill="#bbf7d0" fill-opacity="0.18"></path>
+<!-- Molo Sector -->
+<path d="M 90,390 L 250,380 L 240,510 L 80,500 Z" fill="#a7f3d0" fill-opacity="0.22"></path>
+<!-- Iloilo River Esplanade Waterbody -->
+<path class="river-body" d="M -20,490 Q 140,470 240,460 T 420,430"></path>
+<path d="M -20,490 Q 140,470 240,460 T 420,430" fill="none" id="river-path" stroke="transparent"></path>
+<text class="river-label">
+<textpath href="#river-path" startoffset="30%">ILOILO RIVER ESPLANADE</textpath>
+</text>
+<!-- Secondary Local Roads Network -->
+<g opacity="0.85">
+<!-- Lopez Jaena Ext -->
+<path class="road-secondary" d="M 310,20 L 380,120"></path>
+<path class="road-secondary" d="M 230,120 L 370,160"></path>
+<path class="road-secondary" d="M 50,300 L 200,310"></path>
+<path class="road-secondary" d="M 170,300 L 190,440"></path>
+<path class="road-secondary" d="M 80,430 L 240,430"></path>
+</g>
+<!-- Primary Arterial: Benigno Aquino Jr. Ave (Diversion Road) & Lopez Jaena St -->
+<!-- Outer road border / curb -->
+<path class="road-border" d="M 120,40 L 360,540"></path>
+<path class="road-border" d="M 330,120 L 345,175 L 290,240 L 160,330"></path>
+<!-- Inner road surface -->
+<path class="road-arterial" d="M 120,40 L 360,540"></path>
+<path class="road-arterial" d="M 330,120 L 345,175 L 290,240 L 160,330"></path>
+<!-- Road Centeline Stripe (Diversion Rd) -->
+<path d="M 120,40 L 360,540" fill="none" opacity="0.9" stroke="#f59e0b" stroke-dasharray="6,5" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Road Labels -->
+<text fill="#94a3b8" font-size="8.5" font-weight="700" letter-spacing="0.1em" transform="rotate(64, 135, 110)" x="135" y="110">
+          BENIGNO AQUINO JR. AVE (DIVERSION RD)
+        </text>
+<text fill="#94a3b8" font-size="7.5" font-weight="600" transform="rotate(78, 350, 120)" x="350" y="120">
+          LOPEZ JAENA ST.
+        </text>
+<!-- District Titles on Map -->
+<text fill="#64748b" font-size="14" font-weight="800" letter-spacing="0.18em" opacity="0.45" x="310" y="80">JARO</text>
+<text fill="#64748b" font-size="13" font-weight="800" letter-spacing="0.18em" opacity="0.45" x="175" y="245">MANDURRIAO</text>
+<text fill="#64748b" font-size="13" font-weight="800" letter-spacing="0.18em" opacity="0.45" x="140" y="445">MOLO</text>
+<!-- ROUTE 3 JEEPNEY POLYLINES (Walking dashed + PUV Modern Blue Route) -->
+<!-- Walking Section: CPU Campus Gate 1 to Stop -->
+<path class="walking-dash" d="M 324,128 L 338,135"></path>
+<!-- Active PUV Line: CPU Lopez Jaena -> Junction -> Diversion -> SM City Northwing Overpass -->
+<path class="transit-route-glow" d="M 338,135 L 346,182 Q 330,225 292,242 L 210,300"></path>
+<path class="transit-route" d="M 338,135 L 346,182 Q 330,225 292,242 L 210,300"></path>
+<!-- Map POI: Jaro Cathedral Pin Landmark -->
+<g transform="translate(325, 195)">
+<rect fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.08))" height="18" rx="9" width="70" x="0" y="0"></rect>
+<circle cx="9" cy="9" fill="#fef3c7" r="6"></circle>
+<text font-size="9" x="7" y="12">⛪</text>
+<text fill="#334155" font-size="7.5" font-weight="700" x="19" y="12.5">Jaro Cathedral</text>
+</g>
+<!-- Map POI: Molo Plaza Landmark -->
+<g transform="translate(130, 475)">
+<rect fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.08))" height="17" rx="8.5" width="58" x="0" y="0"></rect>
+<circle cx="8.5" cy="8.5" fill="#d1fae5" r="5.5"></circle>
+<text font-size="8" x="6.5" y="11.5">🏛️</text>
+<text fill="#334155" font-size="7.5" font-weight="700" x="18" y="11.5">Molo Plaza</text>
+</g>
+<!-- Map POI: Festive Walk Mall Landmark -->
+<g transform="translate(100, 310)">
+<rect fill="#ffffff" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.08))" height="18" rx="9" width="68" x="0" y="0"></rect>
+<circle cx="9" cy="9" fill="#e0e7ff" r="6"></circle>
+<text font-size="9" x="7" y="12">🏢</text>
+<text fill="#334155" font-size="7.5" font-weight="700" x="19" y="12.5">Festive Walk</text>
+</g>
+<!-- ORIGIN PIN: CPU GATE 1 -->
+<g data-purpose="origin-marker" transform="translate(324, 128)">
+<circle class="pulse-ring" cx="0" cy="0" fill="#10b981" fill-opacity="0.25" r="14"></circle>
+<circle cx="0" cy="0" fill="#10b981" r="8" stroke="#ffffff" stroke-width="2.5"></circle>
+<!-- Origin Tooltip Tag -->
+<g transform="translate(-115, -42)">
+<rect fill="#0f172a" height="32" opacity="0.95" rx="6" width="124"></rect>
+<text fill="#ffffff" font-size="8.5" font-weight="800" x="8" y="14">START: CPU GATE 1</text>
+<text fill="#94a3b8" font-size="7.5" font-weight="500" x="8" y="25">Lopez Jaena St., Jaro</text>
+<polygon fill="#0f172a" points="105,32 115,32 110,38"></polygon>
+</g>
+</g>
+<!-- PUV STOP INTERCHANGE: Junction / Transfer Point -->
+<g transform="translate(292, 242)">
+<circle cx="0" cy="0" fill="#ffffff" r="4" stroke="#64748b" stroke-width="2"></circle>
+<text fill="#64748b" font-size="7" font-weight="700" x="4" y="-5">Junction</text>
+</g>
+<!-- LIVE PUV BUS BADGE (Route 3 Unit #042) -->
+<g data-purpose="live-puv-beacon" transform="translate(285, 238)">
+<!-- Jeep / Bus icon circle -->
+<circle cx="-16" cy="6" fill="#2563eb" r="11" stroke="#ffffff" stroke-width="2"></circle>
+<text fill="#ffffff" font-size="10" x="-21.5" y="10">🚐</text>
+<!-- Real-time eta badge pill -->
+<g transform="translate(0, -6)">
+<rect fill="#ffffff" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.12))" height="23" rx="5" stroke="#cbd5e1" stroke-width="1" width="90"></rect>
+<!-- Yellow route identifier -->
+<rect fill="#f59e0b" height="19" rx="3.5" width="34" x="2" y="2"></rect>
+<text fill="#ffffff" font-size="8" font-weight="800" x="4.5" y="15">R-03 #42</text>
+<!-- Arrival minutes -->
+<circle cx="43" cy="11" fill="#10b981" r="2.5"></circle>
+<text fill="#0f172a" font-size="7.5" font-weight="800" x="49" y="11">3 min away</text>
+<text fill="#64748b" font-size="6.5" font-weight="600" x="42" y="18.5">14 Seats Open</text>
+</g>
+</g>
+<!-- DESTINATION PIN: SM CITY ILOILO -->
+<g data-purpose="destination-marker" transform="translate(210, 300)">
+<!-- Pin drop shadow -->
+<ellipse cx="0" cy="6" fill="#0f172a" opacity="0.25" rx="8" ry="4"></ellipse>
+<!-- Destination Flag -->
+<path d="M 0,0 L 0,-18" stroke="#dc2626" stroke-linecap="round" stroke-width="2.5"></path>
+<path d="M 0,-18 L 14,-13 L 0,-8 Z" fill="#dc2626"></path>
+<circle cx="0" cy="0" fill="#dc2626" r="4.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<!-- Destination Tooltip Tag -->
+<g transform="translate(-56, -50)">
+<rect fill="#0f172a" height="30" opacity="0.95" rx="6" width="112"></rect>
+<text fill="#ffffff" font-size="8" font-weight="800" x="8" y="13">DESTINATION</text>
+<text fill="#cbd5e1" font-size="7" font-weight="500" x="8" y="23">SM City Mandurriao (Northwing)</text>
+<polygon fill="#0f172a" points="51,30 61,30 56,36"></polygon>
+</g>
+</g>
+</svg>
+<!-- Floating Map Overlays & Badges (Left side) -->
+<div class="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-auto">
+<div class="bg-white/95 backdrop-blur-sm border border-slate-200 px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-[10px] font-bold text-slate-800">100% Modern PUV Active</span>
+</div>
+</div>
+<!-- Floating Map Control Floating Sidebar (Right side, matching desktop controls) -->
+<div class="absolute top-3 right-3 flex flex-col gap-2 z-10 pointer-events-auto" data-purpose="map-quick-controls">
+<!-- Layer Mode Toggle -->
+<button aria-label="Toggle Route Layer" class="w-9 h-9 rounded-xl bg-blue-600 text-white shadow-map-float flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-all" type="button">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+</svg>
+</button>
+<!-- Traffic Radar -->
+<button aria-label="Toggle Traffic Conditions" class="w-9 h-9 rounded-xl bg-white text-slate-700 border border-slate-200 shadow-map-float flex items-center justify-center hover:bg-slate-50 active:scale-95 transition-all" type="button">
+<svg class="w-4 h-4 text-amber-500" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 2c-4.4 0-8 3.6-8 8 0 5.4 7 11.5 7.3 11.8.4.3 1 .3 1.4 0 .3-.3 7.3-6.4 7.3-11.8 0-4.4-3.6-8-8-8zm0 11c-1.7 0-3-1.3-3-3s1.3-3 3-3 3 1.3 3 3-1.3 3-3 3z"></path>
+</svg>
+</button>
+<!-- Live Vehicle Density -->
+<button aria-label="Nearby PUVs" class="w-9 h-9 rounded-xl bg-white text-slate-700 border border-slate-200 shadow-map-float flex items-center justify-center hover:bg-slate-50 active:scale-95 transition-all" type="button">
+<svg class="w-4 h-4 text-blue-600" fill="currentColor" viewbox="0 0 24 24">
+<path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4.66l.12-.34h13.77l.11.34V17z"></path>
+<circle cx="7.5" cy="14.5" r="1.5"></circle>
+<circle cx="16.5" cy="14.5" r="1.5"></circle>
+</svg>
+</button>
+<!-- Re-center Location Pin -->
+<button aria-label="Locate me" class="w-9 h-9 rounded-xl bg-white text-slate-700 border border-slate-200 shadow-map-float flex items-center justify-center hover:bg-slate-50 active:scale-95 transition-all" type="button">
+<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="8"></circle>
+<path d="M12 2v3m0 14v3M2 12h3m14 0h3"></path>
+</svg>
+</button>
+<!-- Zoom Control Cluster -->
+<div class="flex flex-col bg-white rounded-xl border border-slate-200 shadow-map-float overflow-hidden">
+<button aria-label="Zoom In" class="w-9 h-8 flex items-center justify-center text-slate-700 hover:bg-slate-50 active:bg-slate-100 border-b border-slate-100 font-bold text-sm leading-none" type="button">
+            +
+          </button>
+<button aria-label="Zoom Out" class="w-9 h-8 flex items-center justify-center text-slate-700 hover:bg-slate-50 active:bg-slate-100 font-bold text-sm leading-none" type="button">
+            −
+          </button>
+</div>
+</div>
+</main>
+<!-- END: MapViewport -->
+<!-- BEGIN: CommuterNavigationBottomSheet -->
+<section class="relative z-30 bg-white rounded-t-3xl shadow-sheet border-t border-slate-200/90 pt-2 pb-2 px-4 transition-all duration-300" data-purpose="commuter-navigation-sheet">
+<!-- Sheet Drag Indicator Bar -->
+<div class="w-10 h-1 bg-slate-300 rounded-full mx-auto mb-2.5"></div>
+<!-- Quick Route Header with Price & Time -->
+<div class="flex items-center justify-between pb-2 border-b border-slate-100">
+<div class="flex items-center gap-2">
+<span class="bg-blue-600 text-white text-[11px] font-black px-2 py-0.5 rounded shadow-xs tracking-wide">
+            ROUTE 3 PUV
+          </span>
+<div class="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span>22 min trip</span>
+</div>
+</div>
+<div class="text-right">
+<span class="text-xs text-slate-400 font-bold">FARE</span>
+<span class="text-lg font-extrabold text-emerald-700 ml-1">₱15.00</span>
+</div>
+</div>
+<!-- Step-by-Step Wayfinding Itinerary -->
+<div class="mt-2.5 space-y-2 text-xs">
+<!-- Step 1: Walk to CPU Gate -->
+<div class="flex items-start gap-2.5">
+<div class="flex flex-col items-center shrink-0 mt-0.5">
+<span class="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs border border-blue-200">🚶</span>
+<div class="w-0.5 h-4 bg-slate-200 my-0.5"></div>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[11px] font-bold text-slate-800">Walk 120m to CPU Gate 1</p>
+<p class="text-[10px] text-slate-500">Approx. 2 mins • Head west toward Lopez Jaena St.</p>
+</div>
+</div>
+<!-- Step 2: Board Modern Jeepney -->
+<div class="flex items-start gap-2.5">
+<div class="flex flex-col items-center shrink-0">
+<span class="w-6 h-6 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs border border-amber-300">🚐</span>
+<div class="w-0.5 h-4 bg-slate-200 my-0.5"></div>
+</div>
+<div class="flex-1 min-w-0 bg-blue-50/60 p-2 rounded-lg border border-blue-100">
+<div class="flex items-center justify-between">
+<p class="text-[11px] font-black text-blue-900">Board Route 3 Modern PUV</p>
+<span class="text-[9px] font-extrabold bg-blue-600 text-white px-1.5 py-0.2 rounded">NEXT UNIT</span>
+</div>
+<p class="text-[10px] text-blue-700 font-medium mt-0.5">
+              Unit #042 arriving in <strong>3 mins</strong> • 14 Seats Open
+            </p>
+<div class="flex items-center gap-2 mt-1 text-[9px] text-slate-600">
+<span class="font-semibold text-slate-800">Via:</span>
+<span class="truncate">Jaro Plaza ➔ El 98 ➔ Diversion Road</span>
+</div>
+</div>
+</div>
+<!-- Step 3: Alight Point -->
+<div class="flex items-start gap-2.5">
+<div class="flex flex-col items-center shrink-0 mt-0.5">
+<span class="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs border border-rose-300">🏁</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-[11px] font-bold text-slate-800">Alight at SM City Northwing Overpass</p>
+<p class="text-[10px] text-slate-500">Destination reached • Mandurriao Commercial Hub</p>
+</div>
+</div>
+</div>
+<!-- Action Button & LTFRB Matrix Summary -->
+<div class="mt-3 pt-2 border-t border-slate-100 flex items-center gap-2">
+<!-- Start Realtime Turn-by-Turn Navigation -->
+<button class="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white py-2.5 px-4 rounded-xl font-extrabold text-xs shadow-md shadow-blue-500/30 flex items-center justify-center gap-2 transition-transform" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="M13 7l5 5m0 0l-5 5m5-5H6" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Start Navigation</span>
+</button>
+<!-- Alternative Route Pill (Route 10 option) -->
+<button class="bg-slate-100 hover:bg-slate-200 active:scale-[0.98] text-slate-700 py-2.5 px-3 rounded-xl font-bold text-[11px] border border-slate-200/80 flex items-center gap-1 transition-transform" type="button">
+<span class="w-2 h-2 rounded-full bg-slate-400"></span>
+<span>Alt: Route 10 (₱17)</span>
+</button>
+</div>
+<!-- LTFRB Official Region VI Fare Badge -->
+<div class="mt-2 bg-slate-900 text-slate-200 px-3 py-1.5 rounded-lg flex items-center justify-between text-[9px]">
+<div class="flex items-center gap-1.5">
+<span class="text-amber-400 font-black">LTFRB REGION VI</span>
+<span class="text-slate-400">|</span>
+<span>Modern: <strong class="text-white">₱15.00</strong> (Disc. ₱12)</span>
+</div>
+<div>
+<span>Traditional: <strong class="text-white">₱13.00</strong></span>
+</div>
+</div>
+</section>
+<!-- END: CommuterNavigationBottomSheet -->
+<!-- BEGIN: MobileBottomNavigationBar -->
+<nav class="relative z-40 bg-white border-t border-slate-200 px-3 py-1.5 flex items-center justify-around text-center text-[10px] font-semibold text-slate-500" data-purpose="bottom-tab-bar">
+<!-- Route Planner (Active Tab) -->
+<a class="flex-1 flex flex-col items-center text-blue-600 font-bold py-1" href="#planner">
+<svg class="w-5 h-5 mb-0.5" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path>
+</svg>
+<span>Planner</span>
+</a>
+<!-- Jeepney Directory -->
+<a class="flex-1 flex flex-col items-center hover:text-slate-800 py-1 transition-colors" href="#directory">
+<svg class="w-5 h-5 mb-0.5 text-slate-400" fill="currentColor" viewbox="0 0 24 24">
+<path d="M4 16c0 1.1.9 2 2 2h1v2c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-2h4v2c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-2h1c1.1 0 2-.9 2-2V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"></path>
+</svg>
+<span>Jeepneys</span>
+</a>
+<!-- Fare Matrix / Guide -->
+<a class="flex-1 flex flex-col items-center hover:text-slate-800 py-1 transition-colors" href="#fare">
+<svg class="w-5 h-5 mb-0.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<rect height="14" rx="2" width="20" x="2" y="5"></rect>
+<line x1="2" x2="22" y1="10" y2="10"></line>
+<circle cx="7" cy="15" r="1"></circle>
+</svg>
+<span>Fare Guide</span>
+</a>
+<!-- Terminals Hub -->
+<a class="flex-1 flex flex-col items-center hover:text-slate-800 py-1 transition-colors" href="#terminals">
+<svg class="w-5 h-5 mb-0.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+</svg>
+<span>Terminals</span>
+</a>
+</nav>
+<!-- END: MobileBottomNavigationBar -->
+<!-- iOS Home Bar Indicator -->
+<div class="w-full bg-white pb-1 pt-0 flex justify-center">
+<div class="w-32 h-1 bg-slate-300 rounded-full"></div>
+</div>
+</div>
+</body></html>

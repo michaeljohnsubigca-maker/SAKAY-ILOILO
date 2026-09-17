@@ -1,0 +1,166 @@
+// src/components/map/LeafletMap.tsx
+"use client";
+
+import { useEffect, useRef } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { TripOption, LandmarkPOI } from "@/types/transit";
+import { getMarkerSvgString } from "./markers";
+
+interface LeafletMapProps {
+  origin: [number, number] | null;
+  destination: [number, number] | null;
+  originName?: string;
+  destinationName?: string;
+  selectedTrip: TripOption | null;
+  pois: LandmarkPOI[];
+  onSelectPoi?: (poi: LandmarkPOI) => void;
+  onMapClick?: (coords: [number, number]) => void;
+}
+
+export default function LeafletMap({
+  origin,
+  destination,
+  originName = "Origin",
+  destinationName = "Destination",
+  selectedTrip,
+  pois,
+  onSelectPoi,
+  onMapClick,
+}: LeafletMapProps) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const layersRef = useRef<L.LayerGroup | null>(null);
+  const onMapClickRef = useRef(onMapClick);
+
+  useEffect(() => {
+    onMapClickRef.current = onMapClick;
+  }, [onMapClick]);
+
+  // Initialize Map
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
+
+    // Centered at Iloilo City
+    const map = L.map(mapRef.current, {
+      center: [10.7202, 122.5621],
+      zoom: 14,
+      zoomControl: false,
+    });
+
+    // CartoDB Positron clean map tiles
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+      {
+        attribution:
+          '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }
+    ).addTo(map);
+
+    const layers = L.layerGroup().addTo(map);
+    layersRef.current = layers;
+    mapInstanceRef.current = map;
+
+    map.on("click", (e) => {
+      if (onMapClickRef.current) {
+        onMapClickRef.current([e.latlng.lat, e.latlng.lng]);
+      }
+    });
+
+    return () => {
+      map.remove();
+      mapInstanceRef.current = null;
+      layersRef.current = null;
+    };
+  }, []);
+
+  // Update Route Polylines and Markers
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const layers = layersRef.current;
+    if (!map || !layers) return;
+
+    layers.clearLayers();
+
+    const bounds = L.latLngBounds([]);
+
+    // 1. Render Origin Pin
+    if (origin) {
+      const originIcon = L.divIcon({
+        className: "custom-div-icon !bg-transparent !border-0",
+        html: getMarkerSvgString("origin", originName),
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+      });
+      L.marker(origin, { icon: originIcon }).addTo(layers);
+      bounds.extend(origin);
+    }
+
+    // 2. Render Destination Pin
+    if (destination) {
+      const destIcon = L.divIcon({
+        className: "custom-div-icon !bg-transparent !border-0",
+        html: getMarkerSvgString("destination", destinationName),
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+      });
+      L.marker(destination, { icon: destIcon }).addTo(layers);
+      bounds.extend(destination);
+    }
+
+    // 3. Render Selected Trip Polylines & Transfer Nodes
+    if (selectedTrip) {
+      let rideIndex = 0;
+      for (const leg of selectedTrip.legs) {
+        if (leg.type === "walk") {
+          L.polyline(leg.coordinates, {
+            color: "#3b82f6",
+            weight: 4,
+            dashArray: "6, 6",
+            opacity: 0.9,
+          }).addTo(layers);
+          leg.coordinates.forEach((c) => bounds.extend(c));
+        } else if (leg.type === "ride") {
+          // If this is a transfer (subsequent ride leg), render amber transfer marker
+          if (rideIndex > 0 && leg.boardStop) {
+            const transferIcon = L.divIcon({
+              className: "custom-div-icon !bg-transparent !border-0",
+              html: getMarkerSvgString("transfer", leg.boardStop.name),
+              iconSize: [20, 20],
+              iconAnchor: [10, 10],
+            });
+            L.marker(leg.boardStop.location, { icon: transferIcon }).addTo(layers);
+          }
+          rideIndex++;
+
+          // Glow effect
+          L.polyline(leg.coordinates, {
+            color: leg.route.color || "#2563eb",
+            weight: 12,
+            opacity: 0.25,
+            lineCap: "round",
+          }).addTo(layers);
+
+          // Solid line
+          L.polyline(leg.coordinates, {
+            color: leg.route.color || "#2563eb",
+            weight: 6,
+            opacity: 0.95,
+            lineCap: "round",
+            lineJoin: "round",
+          }).addTo(layers);
+
+          leg.coordinates.forEach((c) => bounds.extend(c));
+        }
+      }
+    }
+
+    // Adjust zoom if points are present
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
+    }
+  }, [origin, destination, originName, destinationName, selectedTrip]);
+
+  return <div ref={mapRef} className="w-full h-full bg-[#f1f5f9] select-none" />;
+}
