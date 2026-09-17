@@ -49,14 +49,22 @@ export default function LeafletMap({
     });
 
     // CartoDB Positron clean map tiles
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 19,
-      }
-    ).addTo(map);
+    // CartoDB Positron clean map tiles                                                                                                                                                                                                   
+        L.tileLayer(                                                                                                                                                                                                                          
+          "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",                                                                                                                                                         
+          {                                                                                                                                                                                                                                   
+            attribution:                                                                                                                                                                                                                      
+              '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',                                                                                                     
+            maxZoom: 19,                                                                                                                                                                                                                      
+          }                                                                                                                                                                                                                                   
+        ).addTo(map);                                                                                                                                                                                                                         
+  with:                                                                                                                                                                                                                                       
+        // OpenStreetMap standard tiles (100% free, zero API key required)                                                                                                                                                                    
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {                                                                                                                                                                   
+          attribution:                                                                                                                                                                                                                        
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',                                                                                                                                        
+          maxZoom: 19,                                                                                                                                                                                                                        
+        }).addTo(map);
 
     const layers = L.layerGroup().addTo(map);
     layersRef.current = layers;
