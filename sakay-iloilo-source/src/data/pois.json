@@ -11,8 +11,8 @@
     "category": "school",
     "district": "Jaro",
     "location": [
-      10.7308,
-      122.5493
+      10.7326612,
+      122.5494043
     ]
   },
   {
@@ -27,8 +27,8 @@
     "category": "school",
     "district": "City Proper",
     "location": [
-      10.6995,
-      122.5551
+      10.6983,
+      122.5552
     ]
   },
   {
@@ -43,8 +43,8 @@
     "category": "school",
     "district": "City Proper",
     "location": [
-      10.7001,
-      122.5631
+      10.7002,
+      122.563
     ]
   },
   {
@@ -76,13 +76,13 @@
     "category": "school",
     "district": "Lapaz",
     "location": [
-      10.7153,
-      122.566
+      10.7155,
+      122.5663
     ]
   },
   {
     "id": "poi-phinma-ui",
-    "name": "PHINMA \u2013 University of Iloilo",
+    "name": "PHINMA – University of Iloilo",
     "aliases": [
       "UI",
       "University of Iloilo",
@@ -92,8 +92,8 @@
     "category": "school",
     "district": "City Proper",
     "location": [
-      10.6916,
-      122.5699
+      10.6918766,
+      122.569605
     ]
   },
   {
@@ -123,8 +123,8 @@
     "category": "school",
     "district": "Molo",
     "location": [
-      10.6975,
-      122.554
+      10.6974,
+      122.5534
     ]
   },
   {
@@ -139,8 +139,8 @@
     "category": "school",
     "district": "Molo",
     "location": [
-      10.6985,
-      122.553
+      10.699175,
+      122.5525153
     ]
   },
   {
@@ -155,8 +155,8 @@
     "category": "hospital",
     "district": "Mandurriao",
     "location": [
-      10.7187,
-      122.5418
+      10.7187157,
+      122.5416034
     ]
   },
   {
@@ -171,8 +171,8 @@
     "category": "hospital",
     "district": "Jaro",
     "location": [
-      10.7159,
-      122.561
+      10.7161,
+      122.5611
     ]
   },
   {
@@ -188,7 +188,7 @@
     "district": "City Proper",
     "location": [
       10.7027,
-      122.5667
+      122.5668
     ]
   },
   {
@@ -203,8 +203,8 @@
     "category": "hospital",
     "district": "Molo",
     "location": [
-      10.6991,
-      122.5432
+      10.6994901,
+      122.5427762
     ]
   },
   {
@@ -298,8 +298,8 @@
     "category": "mall",
     "district": "Jaro",
     "location": [
-      10.7238,
-      122.5608
+      10.7212648,
+      122.5581392
     ]
   },
   {
@@ -313,8 +313,8 @@
     "category": "mall",
     "district": "City Proper",
     "location": [
-      10.7011,
-      122.5681
+      10.7014084,
+      122.5681241
     ]
   },
   {
@@ -343,8 +343,8 @@
     "category": "mall",
     "district": "Mandurriao",
     "location": [
-      10.7105,
-      122.552
+      10.7098464,
+      122.553545
     ]
   },
   {
@@ -374,8 +374,8 @@
     "category": "terminal",
     "district": "Jaro",
     "location": [
-      10.7489,
-      122.5779
+      10.7622441,
+      122.5777176
     ]
   },
   {
@@ -390,8 +390,8 @@
     "category": "terminal",
     "district": "Arevalo",
     "location": [
-      10.686,
-      122.518
+      10.6931057,
+      122.4999326
     ]
   },
   {
@@ -438,8 +438,8 @@
     "category": "plaza",
     "district": "Jaro",
     "location": [
-      10.7248,
-      122.5562
+      10.7242518,
+      122.5573051
     ]
   },
   {
@@ -485,8 +485,8 @@
     "category": "plaza",
     "district": "Lapaz",
     "location": [
-      10.7132,
-      122.5682
+      10.7117874,
+      122.5705925
     ]
   },
   {
@@ -500,8 +500,8 @@
     "category": "market",
     "district": "City Proper",
     "location": [
-      10.6929,
-      122.5697
+      10.6927919,
+      122.5697322
     ]
   },
   {
@@ -515,8 +515,8 @@
     "category": "market",
     "district": "City Proper",
     "location": [
-      10.6938,
-      122.5638
+      10.6931068,
+      122.5639931
     ]
   },
   {
@@ -530,8 +530,8 @@
     "category": "market",
     "district": "Lapaz",
     "location": [
-      10.7094,
-      122.5677
+      10.7091786,
+      122.5676034
     ]
   },
   {
@@ -575,8 +575,8 @@
     "category": "government",
     "district": "City Proper",
     "location": [
-      10.7028,
-      122.5682
+      10.7025944,
+      122.5691522
     ]
   }
 ]
