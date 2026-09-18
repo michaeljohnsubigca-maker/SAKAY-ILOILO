@@ -11,8 +11,8 @@
     "category": "school",
     "district": "Jaro",
     "location": [
-      10.7303,
-      122.5489
+      10.7308,
+      122.5493
     ]
   },
   {
@@ -27,8 +27,8 @@
     "category": "school",
     "district": "City Proper",
     "location": [
-      10.6983,
-      122.5552
+      10.6995,
+      122.5551
     ]
   },
   {
@@ -43,8 +43,8 @@
     "category": "school",
     "district": "City Proper",
     "location": [
-      10.7002,
-      122.5630
+      10.7001,
+      122.5631
     ]
   },
   {
@@ -76,13 +76,13 @@
     "category": "school",
     "district": "Lapaz",
     "location": [
-      10.7155,
-      122.5663
+      10.7153,
+      122.566
     ]
   },
   {
     "id": "poi-phinma-ui",
-    "name": "PHINMA – University of Iloilo",
+    "name": "PHINMA \u2013 University of Iloilo",
     "aliases": [
       "UI",
       "University of Iloilo",
@@ -92,7 +92,7 @@
     "category": "school",
     "district": "City Proper",
     "location": [
-      10.6917,
+      10.6916,
       122.5699
     ]
   },
@@ -123,8 +123,8 @@
     "category": "school",
     "district": "Molo",
     "location": [
-      10.6974,
-      122.5534
+      10.6975,
+      122.554
     ]
   },
   {
@@ -139,8 +139,8 @@
     "category": "school",
     "district": "Molo",
     "location": [
-      10.6983,
-      122.5531
+      10.6985,
+      122.553
     ]
   },
   {
@@ -155,8 +155,8 @@
     "category": "hospital",
     "district": "Mandurriao",
     "location": [
-      10.7188,
-      122.5417
+      10.7187,
+      122.5418
     ]
   },
   {
@@ -171,8 +171,8 @@
     "category": "hospital",
     "district": "Jaro",
     "location": [
-      10.7161,
-      122.5611
+      10.7159,
+      122.561
     ]
   },
   {
@@ -188,7 +188,7 @@
     "district": "City Proper",
     "location": [
       10.7027,
-      122.5668
+      122.5667
     ]
   },
   {
@@ -328,7 +328,7 @@
     "category": "mall",
     "district": "City Proper",
     "location": [
-      10.6970,
+      10.697,
       122.5675
     ]
   },
@@ -344,7 +344,7 @@
     "district": "Mandurriao",
     "location": [
       10.7105,
-      122.5520
+      122.552
     ]
   },
   {
@@ -360,7 +360,7 @@
     "district": "Jaro",
     "location": [
       10.7464,
-      122.5390
+      122.539
     ]
   },
   {
@@ -390,8 +390,8 @@
     "category": "terminal",
     "district": "Arevalo",
     "location": [
-      10.6860,
-      122.5180
+      10.686,
+      122.518
     ]
   },
   {
@@ -422,7 +422,7 @@
     "category": "terminal",
     "district": "Mandurriao",
     "location": [
-      10.7170,
+      10.717,
       122.5472
     ]
   },
@@ -560,8 +560,8 @@
     "category": "landmark",
     "district": "Mandurriao",
     "location": [
-      10.7030,
-      122.5550
+      10.703,
+      122.555
     ]
   },
   {

@@ -50,11 +50,12 @@ export default function LeafletMap({
       zoomControl: false,
     });
 
-    // OpenStreetMap standard tiles (100% free, zero API key required)
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    // Google Maps standard roadmap tiles (100% visual match with Google Maps coordinates)
+    L.tileLayer("https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+      subdomains: ["0", "1", "2", "3"],
       attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
+        '&copy; <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Google Maps</a>',
+      maxZoom: 20,
     }).addTo(map);
 
     const layers = L.layerGroup().addTo(map);
